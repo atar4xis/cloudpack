@@ -23,7 +23,7 @@
 **Steps:**
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/cloudpack.git
+    git clone https://github.com/atar4xis/cloudpack.git
     cd cloudpack
     ```
 2. Create and activate a virtual environment (optional but recommended):
