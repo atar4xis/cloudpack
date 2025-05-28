@@ -1,0 +1,143 @@
+import argparse
+from configparser import ConfigParser
+from pathlib import Path
+
+
+DEFAULT_CONFIG = """
+; This is the configuration file for this cloudpack vault.
+; Learn more at https://github.com/atar4xis/cloudpack
+
+[vault]
+version = 0.0.1
+
+[provider:google_drive]
+enabled = False
+client_id = 
+client_secret = 
+
+[provider:dropbox]
+enabled = False
+client_id = 
+client_secret = 
+"""
+
+
+def init_vault(args):
+    """
+    Initialize a new CloudPack vault at the specified path.
+    Creates the directory if it doesn't exist, and writes the default config file.
+    Warns if the directory is not empty.
+    """
+
+    directory = Path(args.path).resolve()
+    print(f"Initializing vault in {directory} ...")
+
+    # create the directory if it doesn't exist
+    if not directory.exists():
+        directory.mkdir(parents=True)
+
+    # warn if the directory is not empty
+    if any(directory.iterdir()):
+        print("Warning: Target directory is not empty")
+        proceed = input("Proceed anyway? (y/N): ")
+        if not proceed.strip().lower().startswith("y"):
+            print("Operation aborted")
+            return
+
+    # write default configuration file
+    config_file = directory / "config.ini"
+    with open(config_file, "w") as f:
+        f.write(DEFAULT_CONFIG)
+
+    # === initial configuration wizard ===
+    config = ConfigParser()
+    config.read(config_file)
+    # TODO: implement wizard
+
+    print("CloudPack vault initialized.")
+    print("Now edit the configuration file:")
+    print(f"  {config_file}")
+
+
+def add_file(args):
+    # TODO: implement
+    pass
+
+
+def upload_vault(args):
+    # TODO: implement
+    pass
+
+
+def configure(args):
+    # TODO: implement
+    pass
+
+
+def main():
+    # === command parser ===
+    commands = [
+        {
+            "name": "init",
+            "help": "initialize a new vault",
+            "func": init_vault,
+            "args": [],
+        },
+        {
+            "name": "config",
+            "help": "configure the vault",
+            "func": configure,
+            "args": [],
+        },
+        {
+            "name": "add",
+            "help": "add a file to the vault",
+            "func": add_file,
+            "args": [
+                {"name": "file", "kwargs": {"help": "path to the file to add"}},
+            ],
+        },
+        {
+            "name": "upload",
+            "help": "upload the vault to the cloud",
+            "func": upload_vault,
+            "args": [],
+        },
+    ]
+
+    # this will be used in both parsers to allow global use
+    path_arg = {
+        "flags": ("-p", "--path"),
+        "kwargs": {
+            "type": Path,
+            "default": ".",
+            "help": "path to the vault directory",
+        },
+    }
+
+    parser = argparse.ArgumentParser()
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(*path_arg["flags"], **path_arg["kwargs"])
+    parent_parser.add_argument(*path_arg["flags"], **path_arg["kwargs"])
+    subparsers = parser.add_subparsers(title="commands", dest="command")
+
+    for cmd in commands:
+        sp = subparsers.add_parser(
+            cmd["name"], parents=[parent_parser], help=cmd["help"]
+        )
+        for arg in cmd["args"]:
+            sp.add_argument(arg["name"], **arg.get("kwargs", {}))
+        sp.set_defaults(func=cmd["func"])
+
+    # === command handler ===
+    args = parser.parse_args()
+
+    if hasattr(args, "func"):
+        args.func(args)
+    else:
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
+
