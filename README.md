@@ -28,7 +28,7 @@
     ```
 2. Create and activate a virtual environment (optional but recommended):
     ```bash
-    python3 -m venv venv
+    python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
     ```
 3. Install the required dependencies:
