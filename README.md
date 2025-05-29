@@ -1,6 +1,7 @@
 # CloudPack
 
 ![Project Status](https://img.shields.io/badge/status-pre--alpha-red)
+![Tests](https://github.com/atar4xis/cloudpack/actions/workflows/python-app.yml/badge.svg)
 
 **CloudPack** is an open-source, multi-cloud file vault. It encrypts your files, splits them into chunks, and stores those chunks across different cloud providers. You hold the only key - your master password.
 
