@@ -55,7 +55,7 @@ Contributions are welcome!
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and setup instructions.
 ## Roadmap
 
-- [ ] Command-Line Interface
+- [x] Command-Line Interface
 - [ ] Core Encryption & Chunking
 - [ ] Basic Vault Operations
 - [ ] Configuration Management
