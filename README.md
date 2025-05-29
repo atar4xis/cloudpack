@@ -41,7 +41,23 @@ pip install -e .
 
 ## Usage/Examples
 
-⚠️ This section is under development.
+After installation, you can access the CLI with:
+
+```bash
+cloudpack --help
+```
+
+To create a new vault in the current directory:
+
+```bash
+cloudpack init
+```
+
+To specify a custom location:
+
+```bash
+cloudpack init --path /path/to/vault
+```
 
 ## Supported Providers
 
