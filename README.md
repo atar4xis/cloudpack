@@ -22,35 +22,22 @@
 
 - Python 3.10 or higher
 - pip (Python package installer)
-- Git (to clone the repository)
 
-**Steps:**
+**Install from PyPI:**
 
-1. Clone the repository:
+```bash
+pip install cloudpack
+```
 
-   ```bash
-   git clone https://github.com/atar4xis/cloudpack.git
-   cd cloudpack
-   ```
+**Install from source (for development):**
 
-2. Create and activate a virtual environment (optional but recommended):
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install the required dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Run cloudpack:
-
-   ```bash
-   python cloudpack.py
-   ```
+```bash
+git clone https://github.com/atar4xis/cloudpack.git
+cd cloudpack
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -e .
+```
 
 ## Usage/Examples
 
@@ -81,3 +68,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and setup instructi
 - [ ] Documentation & Tutorials
 - [ ] API Development
 - [ ] Desktop GUI
+
+```
+
+```
