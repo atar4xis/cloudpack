@@ -6,8 +6,8 @@ from configparser import ConfigParser
 from pathlib import Path
 from getpass import getpass
 
-from crypto import encrypt, decrypt, derive_vault_key
-from utils import is_password_secure
+from cloudpack.crypto import encrypt, decrypt, derive_vault_key
+from cloudpack.utils import is_password_secure
 
 DEFAULT_CONFIG = """
 ; This is the configuration file for this cloudpack vault.
@@ -18,13 +18,13 @@ version = 0.0.1
 
 [provider:google_drive]
 enabled = False
-client_id = 
-client_secret = 
+client_id =
+client_secret =
 
 [provider:dropbox]
 enabled = False
-client_id = 
-client_secret = 
+client_id =
+client_secret =
 """
 
 
@@ -72,15 +72,15 @@ def init_vault(args):
     while not is_password_secure(master_password) and not master_password.startswith(
         "INSECURE: "
     ):
-        print("The password you entered is considered insecure.")
-        print("We recommend using a password that meets the following criteria:")
-        print("- At least 12 characters long")
-        print("- Includes uppercase and lowercase letters")
-        print("- Contains numbers and symbols")
-        print("")
-        print(
-            'If you understand the risks and still wish to proceed, you can bypass this check by prefixing your password with "INSECURE: "'
-        )
+        print("""The password you entered is considered insecure.
+We recommend using a password that meets the following criteria:
+- At least 12 characters long
+- Includes uppercase and lowercase letters
+- Contains numbers and symbols
+
+If you understand the risks and still wish to proceed,
+you can bypass this check by prefixing your password with 'INSECURE: '
+""")
         master_password = getpass("Enter master password: ")
 
     # if the password is insecure, strip the prefix
