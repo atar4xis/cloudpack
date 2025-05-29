@@ -116,6 +116,37 @@ def configure(args):
     pass
 
 
+def unlock(args):
+    """
+    Attempts to unlock the vault using the master password.
+    """
+    passwd_file = Path(args.path).resolve() / ".passwd"
+    if not passwd_file.exists():
+        print(
+            "Error: Missing .passwd file. Make sure you are unlocking a cloudpack vault."
+        )
+        return
+
+    master_password = getpass("Enter master password: ")
+    data = passwd_file.read_bytes()
+    key_salt = data[:16]
+    encrypted_blob = data[16:]
+
+    vault_key = derive_vault_key(master_password, key_salt)
+    try:
+        decrypted = decrypt(encrypted_blob, vault_key)
+    except Exception:
+        print("Invalid master password provided.")
+        return
+
+    if decrypted != b"CloudPack":
+        print("Invalid master password provided.")
+        return
+
+    # TODO: implement
+    print("Vault unlocked!")
+
+
 def main():
     # === command parser ===
     commands = [
@@ -138,6 +169,12 @@ def main():
             "args": [
                 {"name": "file", "kwargs": {"help": "path to the file to add"}},
             ],
+        },
+        {
+            "name": "unlock",
+            "help": "unlock the vault using the master password",
+            "func": unlock,
+            "args": [],
         },
         {
             "name": "upload",
