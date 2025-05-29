@@ -56,7 +56,7 @@ cloudpack init
 To specify a custom location:
 
 ```bash
-cloudpack init --path /path/to/vault
+cloudpack init /path/to/vault
 ```
 
 ## Supported Providers
