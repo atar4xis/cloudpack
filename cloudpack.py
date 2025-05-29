@@ -184,7 +184,8 @@ def main():
         },
     ]
 
-    # this will be used in both parsers to allow global use
+    # define --path so it works globally (before or after subcommands)
+    # e.g. `cloudpack init --path myVault` and `cloudpack --path myVault init`
     path_arg = {
         "flags": ("-p", "--path"),
         "kwargs": {
@@ -219,4 +220,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
