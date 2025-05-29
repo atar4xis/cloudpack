@@ -1,7 +1,11 @@
 import argparse
+import os
 from configparser import ConfigParser
 from pathlib import Path
+from getpass import getpass
 
+from crypto import encrypt, decrypt, derive_vault_key
+from utils import is_password_secure
 
 DEFAULT_CONFIG = """
 ; This is the configuration file for this cloudpack vault.
@@ -60,6 +64,32 @@ def init_vault(args):
     meta_file = directory / "vault.meta"
     with open(meta_file, "w") as f:
         f.write("{}")
+
+    # === master password ===
+    master_password = getpass("Enter master password: ")
+    while not is_password_secure(master_password) and not master_password.startswith(
+        "INSECURE: "
+    ):
+        print("The password you entered is considered insecure.")
+        print("We recommend using a password that meets the following criteria:")
+        print("- At least 12 characters long")
+        print("- Includes uppercase and lowercase letters")
+        print("- Contains numbers and symbols")
+        print("")
+        print(
+            'If you understand the risks and still wish to proceed, you can bypass this check by prefixing your password with "INSECURE: "'
+        )
+        master_password = getpass("Enter master password: ")
+
+    # if the password is insecure, strip the prefix
+    if master_password.startswith("INSECURE: "):
+        master_password = master_password[10:]
+
+    # derive a vault key, encrypt a static string, store it in the .passwd file
+    key_salt = os.urandom(16)
+    vault_key = derive_vault_key(master_password, key_salt)
+    with open(directory / ".passwd", "wb") as f:
+        f.write(key_salt + encrypt(b"CloudPack", vault_key))
 
     # === initial configuration wizard ===
     config = ConfigParser()
