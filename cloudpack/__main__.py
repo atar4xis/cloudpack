@@ -197,7 +197,7 @@ def main():
         },
     }
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog="cloudpack")
     parent_parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument(*path_arg["flags"], **path_arg["kwargs"])
     parent_parser.add_argument(*path_arg["flags"], **path_arg["kwargs"])
