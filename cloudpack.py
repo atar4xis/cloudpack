@@ -44,10 +44,22 @@ def init_vault(args):
             print("Operation aborted")
             return
 
+    # create directory structure
+    dir_tree = [
+        "chunks",
+    ]
+    for dir in dir_tree:
+        Path(directory / dir).mkdir(exist_ok=True)
+
     # write default configuration file
     config_file = directory / "config.ini"
     with open(config_file, "w") as f:
         f.write(DEFAULT_CONFIG)
+
+    # write default meta file
+    meta_file = directory / "vault.meta"
+    with open(meta_file, "w") as f:
+        f.write("{}")
 
     # === initial configuration wizard ===
     config = ConfigParser()
