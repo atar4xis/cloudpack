@@ -156,7 +156,17 @@ def main():
             "name": "init",
             "help": "initialize a new vault",
             "func": init_vault,
-            "args": [],
+            "args": [
+                {
+                    "name": "path",
+                    "kwargs": {
+                        "nargs": "?",
+                        "type": Path,
+                        "help": "optional path to the vault directory",
+                        "default": ".",
+                    },
+                }
+            ],
         },
         {
             "name": "config",
@@ -176,7 +186,17 @@ def main():
             "name": "unlock",
             "help": "unlock the vault using the master password",
             "func": unlock,
-            "args": [],
+            "args": [
+                {
+                    "name": "path",
+                    "kwargs": {
+                        "nargs": "?",
+                        "type": Path,
+                        "help": "optional path to the vault directory",
+                        "default": ".",
+                    },
+                }
+            ],
         },
         {
             "name": "upload",
