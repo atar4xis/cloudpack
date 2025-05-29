@@ -68,7 +68,3 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and setup instructi
 - [ ] Documentation & Tutorials
 - [ ] API Development
 - [ ] Desktop GUI
-
-```
-
-```
