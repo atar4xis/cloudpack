@@ -31,13 +31,13 @@ def get(key):
 @click.argument("key")
 @click.argument("value")
 def set(key, value):
-    """Set a configuration value."""
+    """Set a configuration value"""
     vault.configure("set", key, value)
 
 
 @config.command()
 def list():
-    """List all configuration values."""
+    """List all configuration values"""
     vault.configure("list")
 
 
