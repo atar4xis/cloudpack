@@ -1,8 +1,10 @@
 import os
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
 from getpass import getpass
+from click import UsageError
 
+import cloudpack.config as config
 from cloudpack.crypto import encrypt, decrypt, derive_vault_key
 from cloudpack.utils import is_password_secure
 
@@ -111,8 +113,49 @@ def upload():
 
 
 def configure(action, *args):
-    # TODO: implement
-    pass
+    """
+    Perform configuration actions (get, set, list) on the config file.
+    """
+
+    path = Path(".")
+
+    try:
+        cfg = config.load(path)
+    except FileNotFoundError:
+        raise UsageError("Configuration file not found")
+
+    match action:
+        case "get":
+            if len(args) != 1 or "." not in args[0]:
+                raise UsageError("Invalid configuration key")
+
+            key = args[0]
+
+            try:
+                print(config.get(cfg, key))
+            except (NoSectionError, NoOptionError):
+                raise UsageError("Unknown configuration key")
+
+        case "set":
+            if len(args) != 2 or "." not in args[0]:
+                raise UsageError("Invalid arguments provided")
+
+            key, value = args
+
+            try:
+                config.get(cfg, key)
+            except (NoSectionError, NoOptionError):
+                raise UsageError("Unknown configuration key")
+
+            config.set(cfg, key, value)
+            config.save(cfg, path)
+            print("Configuration updated")
+
+        case "list":
+            config.list(cfg)
+
+        case _:
+            raise UsageError("Unknown action")
 
 
 def unlock(path):
