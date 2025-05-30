@@ -25,14 +25,14 @@ client_secret =
 """
 
 
-def init(args):
+def init(path):
     """
     Initialize a new CloudPack vault at the specified path.
     Creates the directory if it doesn't exist, and writes the default config file.
     Warns if the directory is not empty.
     """
 
-    directory = Path(args.path).resolve()
+    directory = Path(path).resolve()
     print(f"Initializing vault in {directory} ...")
 
     # create the directory if it doesn't exist
@@ -100,26 +100,26 @@ you can bypass this check by prefixing your password with 'INSECURE: '
     print(f"  {config_file}")
 
 
-def add(args):
+def add(file):
     # TODO: implement
     pass
 
 
-def upload(args):
+def upload():
     # TODO: implement
     pass
 
 
-def configure(args):
+def configure(action, *args):
     # TODO: implement
     pass
 
 
-def unlock(args):
+def unlock(path):
     """
     Attempts to unlock the vault using the master password.
     """
-    passwd_file = Path(args.path).resolve() / ".passwd"
+    passwd_file = Path(path).resolve() / ".passwd"
     if not passwd_file.exists():
         print(
             "Error: Missing .passwd file. Make sure you are unlocking a cloudpack vault."
