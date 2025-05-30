@@ -118,44 +118,27 @@ def configure(action, *args):
     """
 
     path = Path(".")
-
     try:
         cfg = config.load(path)
     except FileNotFoundError:
         raise UsageError("Configuration file not found")
 
-    match action:
-        case "get":
-            if len(args) != 1 or "." not in args[0]:
-                raise UsageError("Invalid configuration key")
-
-            key = args[0]
-
-            try:
-                print(config.get(cfg, key))
-            except (NoSectionError, NoOptionError):
-                raise UsageError("Unknown configuration key")
-
-        case "set":
-            if len(args) != 2 or "." not in args[0]:
-                raise UsageError("Invalid arguments provided")
-
-            key, value = args
-
-            try:
+    try:
+        match action:
+            case "get":
+                print(config.get(cfg, args[0]))
+            case "set":
+                key, value = args
                 config.get(cfg, key)
-            except (NoSectionError, NoOptionError):
-                raise UsageError("Unknown configuration key")
-
-            config.set(cfg, key, value)
-            config.save(cfg, path)
-            print("Configuration updated")
-
-        case "list":
-            config.list(cfg)
-
-        case _:
-            raise UsageError("Unknown action")
+                config.set(cfg, key, value)
+                config.save(cfg, path)
+                print("Configuration updated")
+            case "list":
+                config.list(cfg)
+            case _:
+                raise UsageError("Unknown action")
+    except (NoSectionError, NoOptionError, ValueError):
+        raise UsageError("Unknown configuration key")
 
 
 def unlock(path):
