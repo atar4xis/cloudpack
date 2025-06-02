@@ -141,16 +141,16 @@ def configure(action, *args):
         raise UsageError("Unknown configuration key")
 
 
-def unlock(path):
+def validate_master_password(path):
     """
-    Attempts to unlock the vault using the master password.
+    Request and validate the master password.
     """
     passwd_file = Path(path).resolve() / ".passwd"
     if not passwd_file.exists():
         print(
             "Error: Missing .passwd file. Make sure you are unlocking a cloudpack vault."
         )
-        return
+        return False
 
     master_password = getpass("Enter master password: ")
     data = passwd_file.read_bytes()
@@ -162,10 +162,22 @@ def unlock(path):
         decrypted = decrypt(encrypted_blob, vault_key)
     except Exception:
         print("Invalid master password provided.")
-        return
+        return False
 
     if decrypted != b"CloudPack":
         print("Invalid master password provided.")
+        return False
+
+    return master_password
+
+
+def unlock(path):
+    """
+    Unlock the vault using the master password.
+    """
+    path = Path(path)
+    master_password = validate_master_password(path)
+    if not master_password:
         return
 
     # TODO: implement
