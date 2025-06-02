@@ -50,9 +50,7 @@ def init(path):
             return
 
     # create directory structure
-    dir_tree = [
-        "chunks",
-    ]
+    dir_tree = ["chunks", "files"]
     for dir in dir_tree:
         Path(directory / dir).mkdir(exist_ok=True)
 
