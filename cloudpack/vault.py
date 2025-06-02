@@ -189,3 +189,28 @@ def unlock(path):
     # TODO: decrypt chunks and reconstruct files
 
     print("Vault unlocked!")
+
+
+def lock(path):
+    """
+    Lock the vault using the master password.
+    """
+    path = Path(path)
+    master_password = validate_master_password(path)
+    if not master_password:
+        return
+
+    salt = os.urandom(16)
+    key = derive_vault_key(master_password, salt)
+
+    # encrypt meta file
+    with open(path / "vault.meta", "r+b") as f:
+        metadata = f.read()
+        f.seek(0)
+        f.write(salt)
+        f.write(encrypt(metadata, key))
+        f.truncate()
+
+    # TODO: split files into chunks and encrypt them
+
+    print("Vault locked.")
