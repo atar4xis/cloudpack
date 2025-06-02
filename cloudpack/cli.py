@@ -56,6 +56,13 @@ def unlock(path):
 
 
 @cli.command()
+@click.argument("path", type=click.Path(exists=True), default=".")
+def lock(path):
+    """Lock the vault"""
+    vault.lock(path)
+
+
+@cli.command()
 def upload():
     """Upload the vault to the cloud"""
     vault.upload()
