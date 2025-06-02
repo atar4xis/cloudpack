@@ -27,7 +27,7 @@ client_secret =
 """
 
 
-def init(path):
+def init(path) -> None:
     """
     Initialize a new CloudPack vault at the specified path.
     Creates the directory if it doesn't exist, and writes the default config file.
@@ -98,17 +98,17 @@ you can bypass this check by prefixing your password with 'INSECURE: '
     print("CloudPack vault initialized.")
 
 
-def add(file):
+def add(file) -> None:
     # TODO: implement
     pass
 
 
-def upload():
+def upload() -> None:
     # TODO: implement
     pass
 
 
-def configure(action, *args):
+def configure(action, *args) -> None:
     """
     Perform configuration actions (get, set, list) on the config file.
     """
@@ -167,7 +167,7 @@ def validate_master_password(path) -> None | str:
     return master_password
 
 
-def unlock(path):
+def unlock(path) -> None:
     """
     Unlock the vault using the master password.
     """
@@ -191,7 +191,7 @@ def unlock(path):
     print("Vault unlocked!")
 
 
-def lock(path):
+def lock(path) -> None:
     """
     Lock the vault using the master password.
     """
