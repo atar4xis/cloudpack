@@ -176,5 +176,16 @@ def unlock(path):
     if not master_password:
         return
 
-    # TODO: implement
+    # decrypt meta file
+    with open(path / "vault.meta", "r+b") as f:
+        salt = f.read(16)
+        encrypted_meta = f.read()
+        key = derive_vault_key(master_password, salt)
+        metadata = decrypt(encrypted_meta, key)
+        f.seek(0)
+        f.write(metadata)
+        f.truncate()
+
+    # TODO: decrypt chunks and reconstruct files
+
     print("Vault unlocked!")
