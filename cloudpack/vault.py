@@ -96,8 +96,6 @@ you can bypass this check by prefixing your password with 'INSECURE: '
     # TODO: implement wizard
 
     print("CloudPack vault initialized.")
-    print("Now edit the configuration file:")
-    print(f"  {config_file}")
 
 
 def add(file):
