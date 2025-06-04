@@ -3,6 +3,9 @@ from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
 from getpass import getpass
 from click import UsageError
+import math
+import shutil
+import json
 
 import cloudpack.config as config
 from cloudpack.crypto import encrypt, decrypt, derive_vault_key
@@ -176,19 +179,43 @@ def unlock(path) -> None:
     if not master_password:
         return
 
-    # decrypt meta file
     with open(path / "vault.meta", "r+b") as f:
         salt = f.read(16)
         encrypted_meta = f.read()
         key = derive_vault_key(master_password, salt)
         metadata = decrypt(encrypted_meta, key)
         f.seek(0)
-        f.write(metadata)
+        f.write(b"{}")
         f.truncate()
 
-    # TODO: decrypt chunks and reconstruct files
+    chunks_dir = path / "chunks"
+    chunk_metadata = json.loads(metadata)
+    chunk_cache = {}
 
-    print("Vault unlocked!")
+    for relative_path, blocks in chunk_metadata.items():
+        output_path = path / "files" / relative_path
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(output_path, "wb") as out_file:
+            for block in blocks:
+                chunk_id = block["chunk"]
+                offset = block["offset"]
+                size = block["size"]
+
+                if chunk_id not in chunk_cache:
+                    with open(chunks_dir / f"{chunk_id}.chunk", "rb") as chunk_file:
+                        chunk_cache[chunk_id] = chunk_file.read()
+
+                encrypted_block = chunk_cache[chunk_id][offset : offset + size]
+                decrypted_block = decrypt(encrypted_block, key)
+                out_file.write(decrypted_block)
+
+    # remove existing chunks
+    for chunk_file in chunks_dir.iterdir():
+        if chunk_file.is_file():
+            chunk_file.unlink()
+
+    print("Vault unlocked.")
 
 
 def lock(path) -> None:
@@ -203,14 +230,77 @@ def lock(path) -> None:
     salt = os.urandom(16)
     key = derive_vault_key(master_password, salt)
 
-    # encrypt meta file
+    num_chunks = 8  # TODO: make this dynamic
+
+    chunks = [
+        {"id": os.urandom(8).hex(), "data": b"", "offset": 0} for _ in range(num_chunks)
+    ]
+
+    chunk_metadata = {}
+    files_root = path / "files"
+    chunk_index = 0  # for round-robin distribution
+
+    print("Encrypting files...")
+    for file in files_root.rglob("*"):
+        if not file.is_file():
+            continue
+
+        relative_path = str(file.relative_to(files_root))
+        file_metadata = []
+
+        file_size = file.stat().st_size
+        if file_size == 0:
+            chunk_metadata[relative_path] = []
+            continue
+
+        block_size = math.ceil(file_size / num_chunks)
+
+        with open(file, "rb") as f:
+            while True:
+                block = f.read(block_size)
+                if not block:
+                    break
+
+                encrypted_block = encrypt(block, key)
+                chunk = chunks[chunk_index % num_chunks]
+                offset = chunk["offset"]
+
+                chunk["data"] += encrypted_block
+                chunk["offset"] += len(encrypted_block)
+
+                file_metadata.append(
+                    {
+                        "chunk": chunk["id"],
+                        "offset": offset,
+                        "size": len(encrypted_block),
+                    }
+                )
+
+                chunk_index += 1
+
+        chunk_metadata[relative_path] = file_metadata
+
+    print("Writing data...")
+    chunks_dir = path / "chunks"
+    chunks_dir.mkdir(parents=True, exist_ok=True)
+
+    # remove existing chunks
+    for chunk_file in chunks_dir.iterdir():
+        if chunk_file.is_file():
+            chunk_file.unlink()
+
+    # write new chunks
+    for chunk in chunks:
+        with open(chunks_dir / f"{chunk['id']}.chunk", "wb") as f:
+            f.write(chunk["data"])
+
+    print("Writing metadata...")
     with open(path / "vault.meta", "r+b") as f:
-        metadata = f.read()
         f.seek(0)
-        f.write(salt)
-        f.write(encrypt(metadata, key))
+        f.write(salt + encrypt(json.dumps(chunk_metadata).encode(), key))
         f.truncate()
 
-    # TODO: split files into chunks and encrypt them
+    # remove files
+    shutil.rmtree(files_root, ignore_errors=True)
 
     print("Vault locked.")
