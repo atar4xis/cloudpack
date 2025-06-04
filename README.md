@@ -76,8 +76,8 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and setup instructi
 ## Roadmap
 
 - [x] Command-Line Interface
-- [ ] Core Encryption & Chunking
-- [ ] Basic Vault Operations
+- [x] Core Encryption & Chunking
+- [x] Basic Vault Operations
 - [ ] Configuration Management
 - [ ] Google Drive Support
 - [ ] Dropbox Support
