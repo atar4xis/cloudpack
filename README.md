@@ -59,6 +59,22 @@ To specify a custom location:
 cloudpack init /path/to/vault
 ```
 
+Add your files to the vault:
+
+- Place any files or folders inside the `/path/to/vault/files` directory.
+
+Lock the vault to encrypt everything:
+
+```bash
+cloudpack lock /path/to/vault
+```
+
+Unlock the vault to access your files:
+
+```bash
+cloudpack unlock /path/to/vault
+```
+
 ## Supported Providers
 
 ⚠️ This section is under development.
