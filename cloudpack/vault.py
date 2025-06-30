@@ -74,7 +74,8 @@ def init(path) -> None:
     while not is_password_secure(master_password) and not master_password.startswith(
         "INSECURE: "
     ):
-        print("""The password you entered is considered insecure.
+        print(
+            """The password you entered is considered insecure.
 We recommend using a password that meets the following criteria:
 - At least 12 characters long
 - Includes uppercase and lowercase letters
@@ -82,7 +83,8 @@ We recommend using a password that meets the following criteria:
 
 If you understand the risks and still wish to proceed,
 you can bypass this check by prefixing your password with 'INSECURE: '
-""")
+"""
+        )
         master_password = getpass("Enter master password: ")
 
     # if the password is insecure, strip the prefix
