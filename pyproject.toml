@@ -8,8 +8,13 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cryptography",
-    "click"
+    "click==8.2.1",
+    "cryptography==45.0.4",
+    "google_api_python_client==2.170.0",
+    "google_api_python_client==2.171.0",
+    "google_auth_oauthlib==1.2.2",
+    "pytest==8.3.5",
+    "tqdm==4.67.1",
 ]
 
 [project.scripts]
