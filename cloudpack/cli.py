@@ -63,9 +63,10 @@ def lock(path):
 
 
 @cli.command()
-def upload():
+@click.argument("path", type=click.Path(exists=True), default=".")
+def upload(path):
     """Upload the vault to the cloud"""
-    vault.upload()
+    vault.upload(path)
 
 
 if __name__ == "__main__":

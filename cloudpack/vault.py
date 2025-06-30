@@ -6,6 +6,8 @@ from click import UsageError
 import math
 import shutil
 import json
+from importlib import import_module
+from tqdm import tqdm
 
 import cloudpack.config as config
 from cloudpack.crypto import encrypt, decrypt, derive_vault_key
@@ -106,9 +108,61 @@ def add(file) -> None:
     pass
 
 
-def upload() -> None:
-    # TODO: implement
-    pass
+def upload(path) -> None:
+    """
+    Uploads encrypted chunks from a cloudpack vault to configured providers.
+    """
+    chunks_dir = Path(path) / "chunks"
+    all_chunks = list(chunks_dir.glob("*.chunk"))
+
+    if not all_chunks:
+        print("No chunks found. Is the vault locked?")
+        return
+
+    vault_meta_file = Path(path) / "vault.meta"
+    if not vault_meta_file.exists():
+        print("Vault metadata file not found. Is this a cloudpack vault?")
+
+    providers = {}
+    conf = config.load(Path(path))
+    for section in conf.sections():
+        if section.startswith("provider:") and conf.getboolean(section, "enabled"):
+            provider_name = section.split(":", 1)[1]
+            provider_type = conf.get(section, "type")
+
+            try:
+                provider = import_module("cloudpack.providers." + provider_type)
+            except ImportError:
+                print(f"Error: Provider {provider_name} is invalid or unsupported.")
+                print("Upload aborted.")
+                return
+
+            if not provider.auth(conf[section]):
+                print(f"Error: Failed to authenticate with provider: {provider_name}")
+                print("Upload aborted.")
+                return
+
+            providers[provider_name] = provider
+
+    num_providers = len(providers)
+
+    if num_providers == 0:
+        print("No providers available.")
+        return
+
+    chunks_split = [all_chunks[i::num_providers] for i in range(num_providers)]
+
+    print("Uploading chunks...")
+
+    for (provider_name, provider), chunks in zip(providers.items(), chunks_split):
+        for chunk in tqdm(chunks):
+            if not provider.upload(str(chunk)):
+                print(f"Failed to upload chunks to provider: {provider_name}")
+                print("Upload aborted.")
+                return
+            # TODO: store chunk:provider mapping in metadata
+
+    print("Vault uploaded successfully.")
 
 
 def configure(action, *args) -> None:
